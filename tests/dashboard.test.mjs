@@ -3,7 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 class Node_ {
-  constructor(tag) { this.tag = tag; this.children = []; this.attrs = {}; this.className = ""; this._text = ""; this.listeners = {}; }
+  constructor(tag) { this.tag = tag; this.children = []; this.attrs = {}; this.className = ""; this._text = ""; this.listeners = {}; this.styleProps = {}; this.style = { setProperty: (k, v) => { this.styleProps[k] = v; } }; this.classList = { add: (...c) => { this.className += " " + c.join(" "); } }; }
   setAttribute(k, v) { this.attrs[k] = v; }
   append(...kids) { this.children.push(...kids); }
   replaceChildren(...kids) { this.children = kids; }
@@ -69,4 +69,17 @@ test("exempt needs show only the override toggle", () => {
 
 test("the dashboard opens", async () => {
   await openDashboard();
+});
+
+test("cells carry the fill bar: half full for 36 h of a 3-day food limit, none when exempt", () => {
+  members[0].flags["survival-needs"].last = { food: 64 * 3600, water: 64 * 3600, rest: 64 * 3600 };
+  members[0].flags["survival-needs"].override = {};
+  const board = buildBoard(game.time.worldTime);
+  const cells = collect(board, (n) => /survival-needs-cell/.test(n.className));
+  assert.equal(cells[0].styleProps["--sn-fill"], "50%");
+  assert.equal(cells[0].styleProps["--sn-hue"], "60");
+  assert.match(cells[0].className, /has-meter phase-grace/);
+  members[0].flags["survival-needs"].override = { food: true };
+  const exempt = collect(buildBoard(game.time.worldTime), (n) => /survival-needs-cell/.test(n.className))[0];
+  assert.deepEqual(exempt.styleProps, {});
 });

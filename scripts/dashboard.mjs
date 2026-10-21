@@ -1,7 +1,7 @@
-import { ID, evaluateActor, trackedActors } from "./state.mjs";
+import { ID, evaluateActor, getConfig, trackedActors } from "./state.mjs";
 import { formatDuration } from "./actions.mjs";
 import { runAction } from "./dispatch.mjs";
-import { NEEDS } from "./logic.mjs";
+import { NEEDS, needMeter } from "./logic.mjs";
 
 const ICONS = { food: "fa-utensils", water: "fa-glass-water", rest: "fa-bed" };
 const MAIN_ACTION = { food: "intake", water: "intake", rest: "rested" };
@@ -31,6 +31,15 @@ function needCell(row, need) {
   const state = row.needs[need];
   const actorId = row.actor.id;
   const cell = el("div", { cls: `survival-needs-cell level-${state.level}` });
+  const meter = needMeter(need, state, { conMod: row.conMod, config: getConfig() });
+  if (meter) {
+    const style = cell.style;
+    style.setProperty("--sn-fill", `${Math.round(meter.fill * 100)}%`);
+    style.setProperty("--sn-hue", String(meter.hue));
+    style.setProperty("--sn-sat", `${meter.sat}%`);
+    style.setProperty("--sn-light", `${meter.light}%`);
+    cell.classList.add("has-meter", `phase-${meter.phase}`);
+  }
 
   const head = el("div", { cls: "survival-needs-head" }, [el("span", { cls: "survival-needs-chip", text: t(`Level.${state.level}`) })]);
   if (state.level !== "exempt" && state.level !== "untracked") {

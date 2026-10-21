@@ -35,7 +35,10 @@ dashboard (see below).
 ## The dashboard (GM)
 
 Open it from the **campground button in the Token controls** (left toolbar) or from the header menu of a Group sheet.
-One row per character, three cells (Food, Water, Rest). Each cell shows the status (OK / Soon / Due / Overdue), the time
+One row per character, three cells (Food, Water, Rest). The background of each cell is a fill bar: right after a meal
+it is empty and green, and it fills and turns yellow, then red as the time without it approaches the limit (the food
+limit is `3 + Con modifier` days, water is one day, rest is the rest limit setting). Once the limit is passed the bar
+starts over in red-orange and fills once per day, a shade darker for every full day already overdue. Each cell shows the status (OK / Soon / Due / Overdue), the time
 since the last time, how many penalties or saves are owed, and these buttons:
 
 - **Ate / Drank / Rested**: restarts the timer. For food and water a dialog lists the character's consumables of the

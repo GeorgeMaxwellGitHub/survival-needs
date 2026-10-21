@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   HOUR, cycleOverride, durationParts, escapeHtml, evaluateNeed, exhaustionToAdd, foodLimitDays, guessIntakeKind,
-  hoursSince, isExempt, levelRank, planNotification, raceExemptions
+  hoursSince, isExempt, levelRank, needMeter, planNotification, raceExemptions
 } from "../scripts/logic.mjs";
 
 const h = (n) => n * HOUR;
@@ -133,4 +133,26 @@ test("items are guessed as water or food by name", () => {
 test("escapeHtml neutralises markup in names", () => {
   assert.equal(escapeHtml(`<img onerror="x">&'`), "&lt;img onerror=&quot;x&quot;&gt;&amp;&#39;");
   assert.equal(escapeHtml(undefined), "");
+});
+
+test("meter: fills once from green to red within the grace period, then starts over in red", () => {
+  const meter = (need, hours, opts = { conMod: 0 }) => needMeter(need, { level: "ok", hours }, opts);
+  assert.deepEqual(meter("food", 0), { phase: "grace", fill: 0, hue: 120, sat: 65, light: 42 });
+  assert.equal(meter("food", 36).fill, 0.5, "half of the 3-day limit");
+  assert.equal(meter("food", 36).hue, 60);
+  assert.equal(meter("food", 71.99).hue, 0);
+  assert.equal(meter("water", 12).fill, 0.5);
+  assert.equal(meter("rest", 12, { config: { restHours: 24 } }).fill, 0.5);
+
+  const over = meter("food", 72 + 12);
+  assert.equal(over.phase, "over");
+  assert.equal(over.fill, 0.5);
+  assert.ok(over.hue <= 25);
+  assert.ok(meter("food", 72 + 24 * 3 + 1).light < meter("food", 72 + 1).light, "darker the longer it is overdue");
+  assert.ok(meter("food", 72).fill > 0, "a bar is visible right when it becomes overdue");
+});
+
+test("meter: no bar for needs that are skipped or not tracked", () => {
+  assert.equal(needMeter("food", { level: "exempt", hours: 0 }), null);
+  assert.equal(needMeter("food", { level: "untracked", hours: 0 }), null);
 });

@@ -80,6 +80,36 @@ export function evaluateNeed(need, { now, last, conMod = 0, applied = 0, exempt 
   return result;
 }
 
+/** Hours a need can go before it is overdue: the food limit (3 + Con days), a day of water, the rest limit. */
+export function graceHours(need, { conMod = 0, config = DEFAULT_CONFIG } = {}) {
+  if (need === "food") return foodLimitDays(conMod) * DAY_HOURS;
+  if (need === "water") return DAY_HOURS;
+  return { ...DEFAULT_CONFIG, ...config }.restHours;
+}
+
+/**
+ * What the dashboard's fill bar shows for a need.
+ * Within the grace period the bar fills once, from green through yellow to red. Past it the bar starts over and
+ * fills once per day in red-orange, a shade darker for every full day already overdue.
+ * @param {"food"|"water"|"rest"} need
+ * @param {{level: string, hours: number}} state  Result of evaluateNeed.
+ * @param {{conMod?: number, config?: object}} [options]
+ * @returns {{phase: "grace"|"over", fill: number, hue: number, sat: number, light: number}|null}  null: no bar.
+ */
+export function needMeter(need, state, options = {}) {
+  if (state.level === "exempt" || state.level === "untracked") return null;
+  const grace = graceHours(need, options);
+  const hours = Math.max(0, state.hours);
+  if (hours < grace) {
+    const fill = hours / grace;
+    return { phase: "grace", fill, hue: Math.round(120 * (1 - fill)), sat: 65, light: 42 };
+  }
+  const over = hours - grace;
+  const cycle = (over % DAY_HOURS) / DAY_HOURS;
+  const days = Math.floor(over / DAY_HOURS);
+  return { phase: "over", fill: Math.max(0.04, cycle), hue: Math.round(25 * (1 - cycle)), sat: 80, light: Math.max(28, 44 - 6 * Math.min(days, 3)) };
+}
+
 function parseKey(key) {
   if (!key) return null;
   const [level, pending] = String(key).split(":");

@@ -18,7 +18,13 @@
 .survival-needs-cell { display: flex; flex-direction: column; gap: 3px; padding: 4px 6px; border: 1px solid var(--color-border-light-tertiary, #888); border-left: 4px solid var(--sn-ok); border-radius: 4px; }
 .survival-needs-cell.level-soon { border-left-color: var(--sn-soon); }
 .survival-needs-cell.level-due { border-left-color: var(--sn-due); }
-.survival-needs-cell.level-overdue { border-left-color: var(--sn-overdue); background: color-mix(in srgb, var(--sn-overdue) 14%, transparent); }
+.survival-needs-cell.level-overdue { border-left-color: var(--sn-overdue); }
+/* The fill bar: --sn-fill is how far it is filled, the rest is its colour. */
+.survival-needs-cell.has-meter {
+  background: linear-gradient(to right,
+    hsl(var(--sn-hue) var(--sn-sat) var(--sn-light) / 0.6) var(--sn-fill),
+    hsl(var(--sn-hue) var(--sn-sat) var(--sn-light) / 0.12) var(--sn-fill));
+}
 .survival-needs-cell.level-exempt, .survival-needs-cell.level-untracked { border-left-color: var(--sn-muted); opacity: 0.7; }
 
 .survival-needs-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
