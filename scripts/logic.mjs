@@ -197,3 +197,22 @@ const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&
 export function escapeHtml(text) {
   return String(text ?? "").replace(/[&<>"']/g, (c) => ESCAPES[c]);
 }
+
+const OWED = /<p class="survival-needs-owed">.*?<\/p>/s;
+const HINT = /<p class="survival-needs-hint">.*?<\/p>/s;
+const BUTTONS = /<div class="survival-needs-buttons">.*?<\/div>/s;
+
+/**
+ * Turns an open chat card into a finished one: the owed-penalty line, the reminder and the buttons go, and a line with
+ * the outcome takes their place. `doneText` is already HTML-safe.
+ */
+export function resolveCardContent(content, doneText) {
+  return String(content)
+    .replace(OWED, "").replace(HINT, "").replace(BUTTONS, "")
+    .replace(/<\/div>\s*$/, `<p class="survival-needs-done">${doneText}</p></div>`);
+}
+
+/** Replaces the owed-penalty line of an open card (some penalties are still owed after one was applied). */
+export function updateOwedContent(content, owedText) {
+  return String(content).replace(OWED, `<p class="survival-needs-owed">${owedText}</p>`);
+}

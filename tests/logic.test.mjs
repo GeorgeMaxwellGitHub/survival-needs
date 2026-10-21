@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   HOUR, cycleOverride, durationParts, escapeHtml, evaluateNeed, exhaustionToAdd, foodLimitDays, guessIntakeKind,
-  hoursSince, isExempt, levelRank, needMeter, planNotification, raceExemptions
+  hoursSince, isExempt, levelRank, needMeter, planNotification, resolveCardContent, updateOwedContent, raceExemptions
 } from "../scripts/logic.mjs";
 
 const h = (n) => n * HOUR;
@@ -155,4 +155,21 @@ test("meter: fills once from green to red within the grace period, then starts o
 test("meter: no bar for needs that are skipped or not tracked", () => {
   assert.equal(needMeter("food", { level: "exempt", hours: 0 }), null);
   assert.equal(needMeter("food", { level: "untracked", hours: 0 }), null);
+});
+
+const CARD = '<div class="survival-needs-card"><p class="survival-needs-title">T</p><p>Since</p>'
+  + '<p class="survival-needs-owed">Owed: 2</p><p class="survival-needs-hint">Hint</p>'
+  + '<div class="survival-needs-buttons"><button>A</button><button>B</button></div></div>';
+
+test("a finished card loses the owed line, the hint and the buttons and gains the outcome", () => {
+  const done = resolveCardContent(CARD, "Done!");
+  assert.ok(done.includes("Since") && done.includes("T"));
+  assert.ok(!done.includes("owed") && !done.includes("hint") && !done.includes("button"));
+  assert.ok(done.endsWith('<p class="survival-needs-done">Done!</p></div>'));
+});
+
+test("the owed line of an open card can be rewritten", () => {
+  const updated = updateOwedContent(CARD, "Owed: 1");
+  assert.ok(updated.includes('<p class="survival-needs-owed">Owed: 1</p>'));
+  assert.ok(updated.includes("<button>A</button>"));
 });

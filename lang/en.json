@@ -56,7 +56,7 @@
           "water": "Drank (pick an item)"
         },
         "rested": {
-          "rest": "Finished a long rest"
+          "rest": "Take a long rest (opens the rest dialog)"
         },
         "save": {
           "water": "Roll Constitution save DC 15 (half ration)",
@@ -96,7 +96,7 @@
           "water": "Apply thirst",
           "rest": "Apply exhaustion"
         },
-        "rested": "Rested"
+        "rested": "Long rest…"
       },
       "LimitLeft": "The time without food runs out in {time}.",
       "LimitReached": "The time without food has run out.",
@@ -104,6 +104,11 @@
         "water": "Drank only half the ration? Instead of the penalty, roll a Constitution save, DC {dc}.",
         "rest": "From the next hour on: a Constitution save, DC {dc}, every hour; a failure is 1 exhaustion.",
         "restSaves": "{n} hour(s) over the limit: a Constitution save, DC {dc}, for each; every failure is 1 exhaustion."
+      },
+      "Done": {
+        "fulfilled": "Need met.",
+        "penalty": "Penalty applied: +{n} exhaustion (level {level}).",
+        "rested": "Long rest finished."
       }
     },
     "Dialog": {

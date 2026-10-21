@@ -55,3 +55,12 @@ test("players cannot run actions", async () => {
   game.user.isGM = true;
   assert.equal(a.log.length, 0);
 });
+
+test("the rested button opens dnd5e's long rest dialog instead of just marking the time", async () => {
+  const a = actor();
+  let rests = 0;
+  a.longRest = async () => { rests++; return {}; };
+  await runAction("rested", a, "rest");
+  assert.equal(rests, 1);
+  assert.equal(a.log.length, 0, "the timer restarts from dnd5e's restCompleted hook, not here");
+});

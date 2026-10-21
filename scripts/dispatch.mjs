@@ -1,5 +1,5 @@
 import { ID } from "./state.mjs";
-import { applyPenalty, markIntake, markRested, rollSave, toggleOverride } from "./actions.mjs";
+import { applyPenalty, markIntake, rollSave, toggleOverride } from "./actions.mjs";
 import { pickIntake } from "./dialog.mjs";
 
 /**
@@ -22,7 +22,8 @@ export async function runAction(kind, actor, need) {
         await markIntake(actor, need, choice);
         break;
       }
-      case "rested": await markRested(actor); break;
+      // dnd5e's own rest dialog; the rest timer restarts from its restCompleted hook when the rest is finished.
+      case "rested": await actor.longRest(); break;
       case "penalty": await applyPenalty(actor, need); break;
       case "save": await rollSave(actor, need); break;
       case "toggle": await toggleOverride(actor, need); break;

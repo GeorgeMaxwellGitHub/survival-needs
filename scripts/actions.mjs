@@ -1,6 +1,7 @@
 import { ID, STATUS, evaluateActor, exhaustionOf, getConfig } from "./state.mjs";
 import {
-  DAY_HOURS, WATER_SAVE_DC, cycleOverride, durationParts, escapeHtml, exhaustionToAdd, foodLimitDays
+  DAY_HOURS, WATER_SAVE_DC, cycleOverride, durationParts, escapeHtml, exhaustionToAdd, foodLimitDays,
+  resolveCardContent, updateOwedContent
 } from "./logic.mjs";
 
 const gmWhisper = () => ChatMessage.getWhisperRecipients("GM").map((u) => u.id);
@@ -21,6 +22,28 @@ async function removeStatus(actor, need) {
   const id = STATUS[need];
   if (id && actor.statuses?.has(id)) await actor.toggleStatusEffect(id, { active: false });
 }
+
+/**
+ * Brings the open chat cards of a character's need up to date, whether the button on the card or the dashboard was
+ * used. `done` finishes the cards with that text; `owed` (a number) only rewrites the owed-penalty line.
+ */
+async function settleCards(actor, need, { done, owed }) {
+  for (const message of game.messages ?? []) {
+    const card = message.flags?.[ID]?.card;
+    if (!card || card.resolved || card.actorId !== actor.id || card.need !== need) continue;
+    try {
+      if (done !== undefined) {
+        await message.update({ content: resolveCardContent(message.content, done), [flagPath("card", "resolved")]: true });
+      } else {
+        await message.update({ content: updateOwedContent(message.content, game.i18n.format("SURVIVAL_NEEDS.Card.Pending", { n: owed })) });
+      }
+    } catch (err) {
+      console.warn(`${ID} | could not update a chat card`, err);
+    }
+  }
+}
+
+const doneText = (key, data) => game.i18n.format(`SURVIVAL_NEEDS.Card.Done.${key}`, data);
 
 /* -------------------------------------------- */
 /*  State changes                                */
@@ -51,6 +74,8 @@ export async function markIntake(actor, need, { item = null, removeExhaustion = 
   await actor.update(update);
   await removeStatus(actor, need);
 
+  await settleCards(actor, need, { done: doneText("fulfilled") });
+
   // An item use already posts dnd5e's own card; only say something when there is nothing else to see.
   if (item && !removed) return;
   const key = need === "food" ? "Ate" : "Drank";
@@ -66,6 +91,7 @@ export async function markRested(actor, { silent = false } = {}) {
     [flagPath("levels", "rest")]: 0,
     [clearPath("notified", "rest")]: null
   });
+  await settleCards(actor, "rest", { done: doneText("rested") });
   if (!silent) await say(`<p>${game.i18n.format("SURVIVAL_NEEDS.Chat.Rested", { actor: escapeHtml(actor.name) })}</p>`);
 }
 
@@ -90,6 +116,11 @@ export async function applyPenalty(actor, need) {
   const id = STATUS[need];
   if (id && !actor.statuses?.has(id)) await actor.toggleStatusEffect(id, { active: true });
   await say(`<p>${game.i18n.format(`SURVIVAL_NEEDS.Chat.Penalty.${need}`, { actor: escapeHtml(actor.name), n: add, level: current + add })}</p>`);
+
+  // Finish the card, unless more penalties are still owed for the same need.
+  const owedLeft = need === "rest" ? 0 : evaluateActor(actor, game.time.worldTime).needs[need].pending;
+  if (owedLeft > 0) await settleCards(actor, need, { owed: owedLeft });
+  else await settleCards(actor, need, { done: doneText("penalty", { n: add, level: current + add }) });
 }
 
 /** Rolls the Constitution save of a need: DC 15 for half a water ration, the configured DC for missed rest. */

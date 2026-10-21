@@ -41,6 +41,7 @@
 .survival-needs-card p { margin: 2px 0; }
 .survival-needs-title { font-weight: bold; }
 .survival-needs-owed { color: #c0392b; font-weight: bold; }
+.survival-needs-done { color: #4b8b4b; font-weight: bold; }
 .survival-needs-hint { font-size: 0.85em; font-style: italic; opacity: 0.8; }
 .survival-needs-avatar { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; font-size: 20px; }
 .survival-needs-buttons { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }

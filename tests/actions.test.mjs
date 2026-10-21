@@ -7,7 +7,8 @@ globalThis.game = {
   user: { isGM: true },
   settings: { get: (id, key) => ({ restSaveDc: 10 })[key] },
   i18n: { localize: (k) => k, format: (k, d) => `${k} ${JSON.stringify(d ?? {})}` },
-  time: { worldTime: 500 }
+  time: { worldTime: 500 },
+  messages: []
 };
 globalThis.ChatMessage = { create: async (d) => { messages.push(d); return d; }, getWhisperRecipients: () => [] };
 globalThis.ui = { notifications: { warn() {}, error() {} } };
@@ -104,4 +105,48 @@ test("saves use DC 15 for water and the configured DC for rest", async () => {
   await rollSave(a, "water");
   await rollSave(a, "rest");
   assert.deepEqual(a.log.saves, [{ ability: "con", target: 15 }, { ability: "con", target: 10 }]);
+});
+
+const openCard = (actorId, need) => {
+  const message = {
+    flags: { "survival-needs": { card: { actorId, need } } },
+    content: '<div class="survival-needs-card"><p>x</p><p class="survival-needs-owed">Owed: 1</p><div class="survival-needs-buttons"><button>A</button></div></div>',
+    update: async function (d) { this.updates = d; }
+  };
+  game.messages.push(message);
+  return message;
+};
+
+test("eating finishes the open food card of that character and leaves others alone", async () => {
+  game.messages.length = 0;
+  const a = actor();
+  a.id = "a1";
+  const mine = openCard("a1", "food");
+  const otherNeed = openCard("a1", "water");
+  const otherActor = openCard("zz", "food");
+  await markIntake(a, "food");
+  assert.match(mine.updates.content, /survival-needs-done/);
+  assert.equal(mine.updates["flags.survival-needs.card.resolved"], true);
+  assert.equal(otherNeed.updates, undefined);
+  assert.equal(otherActor.updates, undefined);
+});
+
+test("a penalty finishes the card, or only rewrites the owed line while more are owed", async () => {
+  game.messages.length = 0;
+  const a = actor();
+  a.id = "a1";
+  const card = openCard("a1", "food");
+  await applyPenalty(a, "food");
+  assert.match(card.updates.content, /Card.Done.penalty/);
+
+  game.messages.length = 0;
+  const b = actor({ flags: { applied: { food: 0 } } });
+  b.id = "b1";
+  b.flags["survival-needs"].last = { food: 0 };
+  game.time.worldTime = 144 * 3600; // 6 days without food: 3 penalties owed, none applied
+  const open = openCard("b1", "food");
+  await applyPenalty(b, "food");
+  assert.ok(!/survival-needs-done/.test(open.updates.content));
+  assert.match(open.updates.content, /Card.Pending/);
+  game.time.worldTime = 500;
 });

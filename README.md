@@ -41,7 +41,9 @@ limit is `3 + Con modifier` days, water is one day, rest is the rest limit setti
 starts over in red-orange and fills once per day, a shade darker for every full day already overdue. Each cell shows the status (OK / Soon / Due / Overdue), the time
 since the last time, how many penalties or saves are owed, and these buttons:
 
-- **Ate / Drank / Rested**: restarts the timer. For food and water a dialog lists the character's consumables of the
+- **Ate / Drank / Long rest**: restarts the timer. The rest button opens dnd5e's own long rest dialog; the rest timer
+  restarts when the rest is finished.
+  For food and water: For food and water a dialog lists the character's consumables of the
   *Food* type (with quantity and charges); pick one and dnd5e's own usage dialog opens, so charges and quantity are
   spent exactly as when the player clicks the item. The timer restarts only if the item was actually used; "No item"
   just marks the time. An optional checkbox also removes one exhaustion level that this module gave for the same need.
@@ -55,7 +57,9 @@ Double-click a name to open the character sheet.
 
 When a need comes due, the GM gets a whispered chat card: a link to the character, how long ago they last ate, drank or
 rested, how long until the time without food runs out, the exhaustion to apply (in red), and a short italic reminder
-about the save when one applies. Buttons: "Ate…" / "Drank…" / "Rested" and "Apply hunger" / "Apply thirst" /
+about the save when one applies. When the need is dealt with (from the card or from the dashboard) the card is
+rewritten in place: the buttons disappear and a green line says "Need met", "Penalty applied: +1 exhaustion (level 2)" or
+"Long rest finished". If more penalties are still owed after one was applied, only the red line is updated. Buttons: "Ate…" / "Drank…" / "Rested" and "Apply hunger" / "Apply thirst" /
 "Apply exhaustion". A card is posted once when the need comes due, again when it becomes overdue, and for food
 and water again for each further penalty. Only the active GM posts cards.
 
