@@ -1,0 +1,131 @@
+{
+  "SURVIVAL_NEEDS": {
+    "Title": "Survival Needs",
+    "Need": { "food": "Food", "water": "Water", "rest": "Rest" },
+    "Level": {
+      "ok": "OK",
+      "soon": "Soon",
+      "due": "Due",
+      "overdue": "Overdue",
+      "exempt": "Not needed",
+      "untracked": "Not tracked"
+    },
+    "Time": { "Hours": "{h} h", "DaysHours": "{d} d {h} h" },
+    "Settings": {
+      "enabled": {
+        "Name": "Track needs",
+        "Hint": "Turn the timers and chat cards on or off. The dashboard keeps working either way."
+      },
+      "postCards": {
+        "Name": "Post chat cards to the GM",
+        "Hint": "When a need comes due (and when it becomes overdue), whisper a card with action buttons to the GM."
+      },
+      "soonHours": {
+        "Name": "\"Soon\" warning (hours before due)",
+        "Hint": "How many hours before a need comes due the dashboard starts highlighting it."
+      },
+      "restHours": {
+        "Name": "Hours without a long rest",
+        "Hint": "After this many hours without a long rest the character is due for rest, and every further hour needs a Constitution save. Default 24."
+      },
+      "restSaveDc": {
+        "Name": "Constitution save DC for missed rest",
+        "Hint": "DC of the hourly save once the rest limit is exceeded. Default 10."
+      }
+    },
+    "Dashboard": {
+      "Title": "Party Needs",
+      "Open": "Party needs",
+      "Character": "Character",
+      "Exhaustion": "Exhaustion: {n}",
+      "Empty": "No characters to track. Set a primary party in the dnd5e Group sheet and add the player characters to it.",
+      "FooterParty": "Tracking the members of the primary party \"{party}\". Double-click a name to open the sheet.",
+      "FooterNoParty": "No primary party is set, so every player-owned character is tracked. Set one in the Group sheet to limit it.",
+      "Pending": "{n} penalty owed",
+      "Saves": "{n} save(s) owed",
+      "Action": {
+        "intake": { "food": "Ate (pick an item)", "water": "Drank (pick an item)" },
+        "rested": { "rest": "Finished a long rest" },
+        "announce": {
+          "food": "Tell the table they need to eat",
+          "water": "Tell the table they need to drink",
+          "rest": "Tell the table they need to rest"
+        },
+        "save": {
+          "water": "Roll Constitution save DC 15 (half ration)",
+          "rest": "Roll the Constitution save for missed rest"
+        },
+        "penalty": {
+          "food": "Apply hunger and 1 exhaustion",
+          "water": "Apply thirst and exhaustion",
+          "rest": "Apply 1 exhaustion for missed rest"
+        },
+        "toggle": {
+          "auto": "Automatic (by race). Click: does not need this",
+          "exempt": "Does not need this. Click: needs it",
+          "needed": "Needs this. Click: back to automatic"
+        }
+      }
+    },
+    "Card": {
+      "Title": {
+        "food": "{actor} needs to eat",
+        "water": "{actor} needs to drink",
+        "rest": "{actor} needs a long rest"
+      },
+      "Since": {
+        "food": "Last ate {time} ago.",
+        "water": "Last drank {time} ago.",
+        "rest": "Last long rest {time} ago."
+      },
+      "Limit": "Hunger limit: {days} day(s) without food (3 + Constitution modifier).",
+      "Pending": "Exhaustion owed: {n}.",
+      "Saves": "Constitution saves owed: {n} (DC {dc}).",
+      "Button": {
+        "intake": { "food": "Ate…", "water": "Drank…" },
+        "penalty": { "food": "Apply hunger", "water": "Apply thirst", "rest": "Apply exhaustion" },
+        "rested": "Rested",
+        "save": "Con save DC {dc}",
+        "announce": "Tell the player"
+      }
+    },
+    "Dialog": {
+      "Title": { "food": "{actor}: eat", "water": "{actor}: drink" },
+      "Hint": {
+        "food": "What does {actor} eat? Items of the Food type are listed.",
+        "water": "What does {actor} drink? Items of the Food type are listed."
+      },
+      "NoItem": "No item (just mark it)",
+      "Remove": {
+        "food": "Also remove one exhaustion level given for hunger",
+        "water": "Also remove one exhaustion level given for thirst"
+      },
+      "Confirm": "Confirm"
+    },
+    "Chat": {
+      "Ate": "{actor} ate.",
+      "Drank": "{actor} drank.",
+      "AteItem": "{actor} ate {item}.",
+      "DrankItem": "{actor} drank {item}.",
+      "Left": { "quantity": "({n} left)", "charges": "({n} charge(s) left)" },
+      "NothingLeft": "(nothing was left to use up)",
+      "ExhaustionRemoved": "One level of exhaustion is gone.",
+      "Rested": "{actor} finished a long rest.",
+      "Penalty": {
+        "food": "{actor} is malnourished: +{n} exhaustion (level {level}).",
+        "water": "{actor} is dehydrated: +{n} exhaustion (level {level}).",
+        "rest": "{actor} is worn out from lack of rest: +{n} exhaustion (level {level})."
+      },
+      "Announce": {
+        "food": "{actor} needs to eat.",
+        "water": "{actor} needs to drink.",
+        "rest": "{actor} needs a long rest."
+      }
+    },
+    "Notify": {
+      "GmOnly": "Only the GM can do this.",
+      "NoActor": "That character no longer exists.",
+      "Failed": "The action failed. See the console (F12) for details."
+    }
+  }
+}

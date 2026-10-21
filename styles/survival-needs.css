@@ -1,0 +1,45 @@
+.survival-needs-app {
+  --sn-ok: #4b8b4b;
+  --sn-soon: #c9a227;
+  --sn-due: #d9822b;
+  --sn-overdue: #c0392b;
+  --sn-muted: #8a8a8a;
+}
+
+.survival-needs-board { display: flex; flex-direction: column; gap: 6px; padding: 4px; }
+.survival-needs-row { display: grid; grid-template-columns: minmax(150px, 1.2fr) repeat(3, minmax(170px, 1fr)); gap: 6px; align-items: stretch; }
+.survival-needs-columns { font-weight: bold; align-items: center; }
+.survival-needs-colhead { display: flex; gap: 6px; align-items: center; }
+
+.survival-needs-who { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.survival-needs-who img { width: 36px; height: 36px; border: none; border-radius: 4px; object-fit: cover; }
+.survival-needs-sub { font-size: var(--font-size-12, 12px); opacity: 0.75; }
+
+.survival-needs-cell { display: flex; flex-direction: column; gap: 3px; padding: 4px 6px; border: 1px solid var(--color-border-light-tertiary, #888); border-left: 4px solid var(--sn-ok); border-radius: 4px; }
+.survival-needs-cell.level-soon { border-left-color: var(--sn-soon); }
+.survival-needs-cell.level-due { border-left-color: var(--sn-due); }
+.survival-needs-cell.level-overdue { border-left-color: var(--sn-overdue); background: color-mix(in srgb, var(--sn-overdue) 14%, transparent); }
+.survival-needs-cell.level-exempt, .survival-needs-cell.level-untracked { border-left-color: var(--sn-muted); opacity: 0.7; }
+
+.survival-needs-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.survival-needs-chip { font-weight: bold; }
+.survival-needs-time { font-variant-numeric: tabular-nums; }
+.survival-needs-note { font-size: var(--font-size-12, 12px); color: var(--sn-overdue); }
+
+.survival-needs-tools { display: flex; gap: 4px; flex-wrap: wrap; }
+.survival-needs-btn { flex: 0 0 auto; width: 28px; height: 24px; padding: 0; line-height: 1; }
+.survival-needs-btn.danger { color: var(--sn-overdue); }
+
+.survival-needs-empty, .survival-needs-footer { margin: 4px 0 0; font-size: var(--font-size-12, 12px); opacity: 0.75; }
+
+.survival-needs-card h3 { margin: 0 0 4px; border: none; }
+.survival-needs-card p { margin: 2px 0; }
+.survival-needs-buttons { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.survival-needs-buttons button { flex: 1 1 auto; width: auto; }
+
+.survival-needs-dialog { display: flex; flex-direction: column; gap: 4px; }
+.survival-needs-choice { display: flex; align-items: center; gap: 6px; }
+.survival-needs-choice img { width: 24px; height: 24px; border: none; }
+.survival-needs-choice span { flex: 1; }
+.survival-needs-choice em { opacity: 0.75; }
+.survival-needs-remove { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
