@@ -24,10 +24,10 @@ export async function pickIntake(actor, need) {
 
   const radios = rows.map(({ item }) => {
     const checked = item === preselected?.item ? " checked" : "";
-    return `<label class="survival-needs-choice"><input type="radio" name="item" value="${escapeHtml(item.id)}"${checked}>`
+    return `<label class="survival-needs-choice"><input type="radio" name="intake" value="${escapeHtml(item.id)}"${checked}>`
       + `<img src="${escapeHtml(item.img)}" alt=""><span>${escapeHtml(item.name)}</span><em>${escapeHtml(stockOf(item))}</em></label>`;
   }).join("");
-  const none = `<label class="survival-needs-choice"><input type="radio" name="item" value=""${preselected ? "" : " checked"}>`
+  const none = `<label class="survival-needs-choice"><input type="radio" name="intake" value=""${preselected ? "" : " checked"}>`
     + `<span>${escapeHtml(t("NoItem"))}</span></label>`;
   const content = `<div class="survival-needs-dialog"><p>${escapeHtml(t(`Hint.${need}`, { actor: actor.name }))}</p>`
     + `${radios}${none}`
@@ -41,9 +41,10 @@ export async function pickIntake(actor, need) {
     ok: {
       label: t("Confirm"),
       callback: (event, button) => {
-        const form = button.form;
-        const id = form.elements.item?.value ?? "";
-        return { item: id ? actor.items.get(id) ?? null : null, removeExhaustion: !!form.elements.remove?.checked };
+        // namedItem, not elements.item: "item" is the collection's own method and would shadow a field of that name.
+        const elements = button.form.elements;
+        const id = elements.namedItem("intake")?.value ?? "";
+        return { item: id ? actor.items.get(id) ?? null : null, removeExhaustion: !!elements.namedItem("remove")?.checked };
       }
     }
   });

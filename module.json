@@ -2,7 +2,7 @@
   "id": "survival-needs",
   "title": "Survival Needs",
   "description": "A GM dashboard that tracks how long each party member has gone without food, water and a long rest (D&D 5e rules), posts a chat card with buttons when a need comes due, and lets the GM apply hunger, thirst and exhaustion with one click. Nothing is applied automatically.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "authors": [
     {
       "name": "GeorgeMaxwell"
@@ -44,5 +44,5 @@
   ],
   "url": "https://github.com/GeorgeMaxwellGitHub/survival-needs",
   "manifest": "https://github.com/GeorgeMaxwellGitHub/survival-needs/releases/latest/download/module.json",
-  "download": "https://github.com/GeorgeMaxwellGitHub/survival-needs/releases/download/v0.1.2/module.zip"
+  "download": "https://github.com/GeorgeMaxwellGitHub/survival-needs/releases/download/v0.1.3/module.zip"
 }
