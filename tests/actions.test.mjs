@@ -100,11 +100,21 @@ test("the override toggle cycles automatic, not needed, needed, automatic", asyn
   assert.deepEqual(c.log.updates[0], { "flags.survival-needs.override.-=food": null });
 });
 
-test("saves use DC 15 for water and the configured DC for rest", async () => {
+test("saves use DC 15 for water and the configured DC for rest; a rolled rest save is counted", async () => {
   const a = actor();
+  a.rollSavingThrow = async (cfg) => { a.log.saves.push(cfg); return [{}]; };
   await rollSave(a, "water");
+  assert.equal(a.log.updates.length, 0);
   await rollSave(a, "rest");
   assert.deepEqual(a.log.saves, [{ ability: "con", target: 15 }, { ability: "con", target: 10 }]);
+  assert.deepEqual(a.log.updates, [{ "flags.survival-needs.applied.rest": 1 }]);
+});
+
+test("a cancelled save is not counted", async () => {
+  const a = actor();
+  a.rollSavingThrow = async () => null;
+  await rollSave(a, "rest");
+  assert.equal(a.log.updates.length, 0);
 });
 
 const openCard = (actorId, need) => {

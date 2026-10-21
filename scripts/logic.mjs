@@ -49,11 +49,12 @@ export function durationParts(hours) {
  * @param {number} data.now
  * @param {number|undefined} data.last        Game time of the last meal / drink / long rest.
  * @param {number} [data.conMod]
- * @param {number} [data.applied]             Penalties already applied since the last meal / drink (food, water).
+ * @param {number} [data.applied]             Penalties already applied since the last meal / drink (food, water),
+ *                                            or saves already rolled since the last long rest (rest).
  * @param {boolean} [data.exempt]
  * @param {{soonHours:number, restHours:number}} [data.config]
  * @returns {{need: string, level: string, hours: number, pending: number, saves: number}}
- *   pending: penalties due and not yet applied (food, water); saves: hourly saves owed (rest).
+ *   pending: penalties due and not yet applied (food, water); saves: hourly saves owed and not yet rolled (rest).
  */
 export function evaluateNeed(need, { now, last, conMod = 0, applied = 0, exempt = false, config = DEFAULT_CONFIG } = {}) {
   const base = { need, level: "ok", hours: 0, pending: 0, saves: 0 };
@@ -76,7 +77,7 @@ export function evaluateNeed(need, { now, last, conMod = 0, applied = 0, exempt 
   const days = Math.floor(hours / DAY_HOURS);
   if (need === "food") result.pending = Math.max(0, days - foodLimitDays(conMod) - applied);
   else if (need === "water") result.pending = Math.max(0, days - applied);
-  else result.saves = Math.max(0, Math.floor(hours - cfg.restHours));
+  else result.saves = Math.max(0, Math.floor(hours - cfg.restHours) - applied);
   return result;
 }
 

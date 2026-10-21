@@ -47,7 +47,7 @@ since the last time, how many penalties or saves are owed, and these buttons:
   *Food* type (with quantity and charges); pick one and dnd5e's own usage dialog opens, so charges and quantity are
   spent exactly as when the player clicks the item. The timer restarts only if the item was actually used; "No item"
   just marks the time. An optional checkbox also removes one exhaustion level that this module gave for the same need.
-- **d20** (water, rest): rolls the Constitution save (DC 15 for water, the configured DC for rest).
+- **d20** (water, rest): rolls the Constitution save (DC 15 for water, the configured DC for rest). Every rest save you roll counts off one of the hourly saves owed; the module does not read the result, so you apply the exhaustion for a failure yourself.
 - **Warning sign**: applies the penalty: the Malnutrition or Dehydration status where it applies, plus exhaustion.
 - **Wand / ban / check**: cycles the override for that need: automatic (by race) → not needed → needed → automatic.
 

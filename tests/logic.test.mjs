@@ -53,6 +53,8 @@ test("rest: due after 24 h, then one Con save per further hour", () => {
   assert.equal(at(25).level, "overdue");
   assert.equal(at(25).saves, 1);
   assert.equal(at(30).saves, 6);
+  assert.equal(evaluateNeed("rest", { now: h(30), last: 0, applied: 2 }).saves, 4, "rolled saves are counted off");
+  assert.equal(evaluateNeed("rest", { now: h(30), last: 0, applied: 9 }).saves, 0);
   assert.equal(at(30, { restHours: 36, soonHours: 4 }).level, "ok");
   assert.equal(at(36, { restHours: 36, soonHours: 4 }).level, "due");
 });

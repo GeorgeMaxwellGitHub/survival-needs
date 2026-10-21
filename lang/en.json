@@ -103,7 +103,7 @@
       "Hint": {
         "water": "Drank only half the ration? Instead of the penalty, roll a Constitution save, DC {dc}.",
         "rest": "From the next hour on: a Constitution save, DC {dc}, every hour; a failure is 1 exhaustion.",
-        "restSaves": "{n} hour(s) over the limit: a Constitution save, DC {dc}, for each; every failure is 1 exhaustion."
+        "restSaves": "Saves to roll: {n}. DC {dc}; every failure is 1 exhaustion."
       },
       "Done": {
         "fulfilled": "Need met.",

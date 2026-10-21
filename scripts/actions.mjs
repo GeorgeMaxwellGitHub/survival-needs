@@ -89,6 +89,7 @@ export async function markRested(actor, { silent = false } = {}) {
   await actor.update({
     [flagPath("last", "rest")]: game.time.worldTime,
     [flagPath("levels", "rest")]: 0,
+    [flagPath("applied", "rest")]: 0,
     [clearPath("notified", "rest")]: null
   });
   await settleCards(actor, "rest", { done: doneText("rested") });
@@ -123,10 +124,17 @@ export async function applyPenalty(actor, need) {
   else await settleCards(actor, need, { done: doneText("penalty", { n: add, level: current + add }) });
 }
 
-/** Rolls the Constitution save of a need: DC 15 for half a water ration, the configured DC for missed rest. */
-export function rollSave(actor, need) {
+/**
+ * Rolls the Constitution save of a need: DC 15 for half a water ration, the configured DC for missed rest.
+ * A rest save that was actually rolled counts off one of the hourly saves owed; the result is the GM's to act on.
+ */
+export async function rollSave(actor, need) {
   const target = need === "water" ? WATER_SAVE_DC : getConfig().restSaveDc;
-  return actor.rollSavingThrow({ ability: "con", target });
+  const rolls = await actor.rollSavingThrow({ ability: "con", target });
+  if (need === "rest" && rolls?.length) {
+    await actor.update({ [flagPath("applied", "rest")]: (actor.flags?.[ID]?.applied?.rest ?? 0) + 1 });
+  }
+  return rolls;
 }
 
 /** Cycles the GM override of a need: automatic → not needed → needed → automatic. */
