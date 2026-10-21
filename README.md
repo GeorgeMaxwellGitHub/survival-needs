@@ -43,7 +43,7 @@ since the last time, how many penalties or saves are owed, and these buttons:
 
 - **Ate / Drank / Long rest**: restarts the timer. The rest button opens dnd5e's own long rest dialog; the rest timer
   restarts when the rest is finished.
-  For food and water: For food and water a dialog lists the character's consumables of the
+  For food and water a dialog lists the character's consumables of the
   *Food* type (with quantity and charges); pick one and dnd5e's own usage dialog opens, so charges and quantity are
   spent exactly as when the player clicks the item. The timer restarts only if the item was actually used; "No item"
   just marks the time. An optional checkbox also removes one exhaustion level that this module gave for the same need.
