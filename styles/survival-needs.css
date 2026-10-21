@@ -32,8 +32,11 @@
 
 .survival-needs-empty, .survival-needs-footer { margin: 4px 0 0; font-size: var(--font-size-12, 12px); opacity: 0.75; }
 
-.survival-needs-card h3 { margin: 0 0 4px; border: none; }
 .survival-needs-card p { margin: 2px 0; }
+.survival-needs-title { font-weight: bold; }
+.survival-needs-owed { color: #c0392b; font-weight: bold; }
+.survival-needs-hint { font-size: 0.85em; font-style: italic; opacity: 0.8; }
+.survival-needs-avatar { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; font-size: 20px; }
 .survival-needs-buttons { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .survival-needs-buttons button { flex: 1 1 auto; width: auto; }
 

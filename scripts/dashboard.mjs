@@ -46,7 +46,6 @@ function needCell(row, need) {
   const tools = el("div", { cls: "survival-needs-tools" });
   if (state.level !== "exempt") {
     tools.append(button(MAIN_ACTION[need], need, actorId, ICONS[need], t(`Dashboard.Action.${MAIN_ACTION[need]}.${need}`), "primary"));
-    tools.append(button("announce", need, actorId, "fa-bullhorn", t(`Dashboard.Action.announce.${need}`)));
     if (need !== "food") tools.append(button("save", need, actorId, "fa-dice-d20", t(`Dashboard.Action.save.${need}`)));
     tools.append(button("penalty", need, actorId, "fa-triangle-exclamation", t(`Dashboard.Action.penalty.${need}`), "danger"));
   }

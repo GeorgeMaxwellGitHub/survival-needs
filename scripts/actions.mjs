@@ -1,6 +1,6 @@
 import { ID, STATUS, evaluateActor, exhaustionOf, getConfig } from "./state.mjs";
 import {
-  WATER_SAVE_DC, cycleOverride, durationParts, escapeHtml, exhaustionToAdd, foodLimitDays, planConsumption
+  DAY_HOURS, WATER_SAVE_DC, cycleOverride, durationParts, escapeHtml, exhaustionToAdd, foodLimitDays
 } from "./logic.mjs";
 
 const gmWhisper = () => ChatMessage.getWhisperRecipients("GM").map((u) => u.id);
@@ -27,11 +27,11 @@ async function removeStatus(actor, need) {
 /* -------------------------------------------- */
 
 /**
- * The character ate or drank: restarts the timer, clears the dnd5e status, optionally uses up an item and takes
- * back one exhaustion level this module gave for the same need.
+ * The character ate or drank: restarts the timer, clears the dnd5e status and optionally takes back one exhaustion
+ * level this module gave for the same need. Using up the item is dnd5e's own job (see dispatch.mjs).
  * @param {Actor} actor
  * @param {"food"|"water"} need
- * @param {{item?: Item|null, removeExhaustion?: boolean}} [options]
+ * @param {{item?: Item|null, removeExhaustion?: boolean}} [options]  item: the item that was used, if any.
  */
 export async function markIntake(actor, need, { item = null, removeExhaustion = false } = {}) {
   const update = {
@@ -39,11 +39,6 @@ export async function markIntake(actor, need, { item = null, removeExhaustion = 
     [flagPath("applied", need)]: 0,
     [clearPath("notified", need)]: null
   };
-  let consumed = null;
-  if (item) {
-    consumed = planConsumption({ quantity: item.system?.quantity, usesMax: item.system?.uses?.max, usesSpent: item.system?.uses?.spent });
-    if (consumed) await item.update(consumed.updates);
-  }
   let removed = 0;
   if (removeExhaustion) {
     const owed = actor.flags?.[ID]?.levels?.[need] ?? 0;
@@ -56,13 +51,10 @@ export async function markIntake(actor, need, { item = null, removeExhaustion = 
   await actor.update(update);
   await removeStatus(actor, need);
 
+  // An item use already posts dnd5e's own card; only say something when there is nothing else to see.
+  if (item && !removed) return;
   const key = need === "food" ? "Ate" : "Drank";
   let text = game.i18n.format(`SURVIVAL_NEEDS.Chat.${key}`, { actor: escapeHtml(actor.name) });
-  if (item) {
-    text = game.i18n.format(`SURVIVAL_NEEDS.Chat.${key}Item`, { actor: escapeHtml(actor.name), item: escapeHtml(item.name) });
-    if (consumed) text += ` ${game.i18n.format(`SURVIVAL_NEEDS.Chat.Left.${consumed.unit}`, { n: consumed.left })}`;
-    else text += ` ${game.i18n.localize("SURVIVAL_NEEDS.Chat.NothingLeft")}`;
-  }
   if (removed) text += ` ${game.i18n.localize("SURVIVAL_NEEDS.Chat.ExhaustionRemoved")}`;
   await say(`<p>${text}</p>`);
 }
@@ -106,11 +98,6 @@ export function rollSave(actor, need) {
   return actor.rollSavingThrow({ ability: "con", target });
 }
 
-/** Tells the table (publicly) that a character needs something. */
-export function announce(actor, need) {
-  return say(`<p>${game.i18n.format(`SURVIVAL_NEEDS.Chat.Announce.${need}`, { actor: escapeHtml(actor.name) })}</p>`);
-}
-
 /** Cycles the GM override of a need: automatic → not needed → needed → automatic. */
 export function toggleOverride(actor, need) {
   const next = cycleOverride(actor.flags?.[ID]?.override?.[need]);
@@ -122,34 +109,45 @@ export function toggleOverride(actor, need) {
 /* -------------------------------------------- */
 
 const CARD_BUTTONS = {
-  food: ["intake", "penalty", "announce"],
-  water: ["intake", "save", "penalty", "announce"],
-  rest: ["rested", "save", "penalty", "announce"]
+  food: ["intake", "penalty"],
+  water: ["intake", "penalty"],
+  rest: ["rested", "penalty"]
 };
+
+/** A clickable link to the character, safe to put into message HTML. */
+function actorLink(actor) {
+  const name = escapeHtml(String(actor.name).replace(/[[\]{}]/g, ""));
+  return `@UUID[${actor.uuid}]{${name}}`;
+}
 
 /** Posts a card to the GM with the buttons to deal with a need that has come due. */
 export function postNeedCard(actor, need, state) {
   const t = (key, data) => game.i18n.format(`SURVIVAL_NEEDS.Card.${key}`, data);
-  const name = escapeHtml(actor.name);
-  const lines = [t(`Since.${need}`, { time: formatDuration(state.hours) })];
-  if (need === "food") lines.push(t("Limit", { days: foodLimitDays(actor.system?.abilities?.con?.mod) }));
-  if (state.pending) lines.push(t("Pending", { n: state.pending }));
-  if (need === "rest" && state.saves) lines.push(t("Saves", { n: state.saves, dc: getConfig().restSaveDc }));
+  const dc = need === "water" ? WATER_SAVE_DC : getConfig().restSaveDc;
+  const lines = [`<p class="survival-needs-title">${t(`Title.${need}`, { actor: actorLink(actor) })}</p>`];
+  lines.push(`<p>${t(`Since.${need}`, { time: formatDuration(state.hours) })}`
+    + (need === "food" ? ` ${foodLimitLine(actor, state, t)}` : "") + "</p>");
+  if (state.pending) lines.push(`<p class="survival-needs-owed">${t("Pending", { n: state.pending })}</p>`);
+  if (need === "water") lines.push(`<p class="survival-needs-hint">${t("Hint.water", { dc })}</p>`);
+  if (need === "rest") lines.push(`<p class="survival-needs-hint">${t(state.saves ? "Hint.restSaves" : "Hint.rest", { n: state.saves, dc })}</p>`);
 
   const buttons = CARD_BUTTONS[need].map((action) => {
-    const key = action === "intake" || action === "penalty" ? `${action}.${need}` : action;
-    const label = t(`Button.${key}`, { dc: need === "water" ? WATER_SAVE_DC : getConfig().restSaveDc });
-    return `<button type="button" data-sn-action="${action}">${escapeHtml(label)}</button>`;
+    const key = action === "rested" ? "rested" : `${action}.${need}`;
+    return `<button type="button" data-sn-action="${action}">${escapeHtml(t(`Button.${key}`))}</button>`;
   });
-  const content = `<div class="survival-needs-card"><h3>${t(`Title.${need}`, { actor: name })}</h3>`
-    + lines.map((l) => `<p>${l}</p>`).join("")
-    + `<div class="survival-needs-buttons">${buttons.join("")}</div></div>`;
+  const content = `<div class="survival-needs-card">${lines.join("")}<div class="survival-needs-buttons">${buttons.join("")}</div></div>`;
   return ChatMessage.create({
     content,
     whisper: gmWhisper(),
     speaker: { alias: game.i18n.localize("SURVIVAL_NEEDS.Title") },
     flags: { [ID]: { card: { actorId: actor.id, need } } }
   });
+}
+
+/** How long until the character's time without food runs out (3 + Con modifier days), worked out for the GM. */
+function foodLimitLine(actor, state, t) {
+  const left = foodLimitDays(actor.system?.abilities?.con?.mod) * DAY_HOURS - state.hours;
+  return left > 0 ? t("LimitLeft", { time: formatDuration(left) }) : t("LimitReached");
 }
 
 /** Re-evaluates a character: used by the dashboard and the card buttons to show the current state. */

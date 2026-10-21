@@ -156,30 +156,6 @@ export function cycleOverride(override) {
   return override === true ? false : undefined;
 }
 
-/**
- * Plans using one portion of a consumable.
- * An item with charges spends a charge; when that was the last charge and more units remain, one unit is used up and
- * the charges are restored for the next one (a ration with one charge, a waterskin with four). An item without
- * charges loses one from its quantity. Nothing is ever deleted.
- * @param {{quantity?: number, usesMax?: number, usesSpent?: number}} item
- * @returns {{updates: object, left: number, unit: "charges"|"quantity"}|null}  null when nothing is left.
- */
-export function planConsumption({ quantity, usesMax, usesSpent } = {}) {
-  const qty = Number(quantity) || 0;
-  const max = Number(usesMax) || 0;
-  const spent = Number(usesSpent) || 0;
-  if (max > 0) {
-    const value = Math.max(0, max - spent);
-    if (value <= 0) return null;
-    if (value === 1 && qty > 1) {
-      return { updates: { "system.quantity": qty - 1, "system.uses.spent": 0 }, left: qty - 1, unit: "quantity" };
-    }
-    return { updates: { "system.uses.spent": spent + 1 }, left: value - 1, unit: "charges" };
-  }
-  if (qty <= 0) return null;
-  return { updates: { "system.quantity": qty - 1 }, left: qty - 1, unit: "quantity" };
-}
-
 /** Guesses whether a "Food"-type consumable is something to drink. The dialog lets the GM pick either way. */
 export function guessIntakeKind(name) {
   return /вод[аыуе]|бурд|фляг|напит|\bэль\b|вино|water|flask|canteen|\bale\b|wine|drink/i.test(String(name ?? "")) ? "water" : "food";

@@ -49,9 +49,9 @@ test("levels show in the cells: 100 h without anything is overdue for Elwin, 20 
 test("action buttons per need: food has no save button, water and rest do", () => {
   const board = buildBoard(game.time.worldTime);
   const kinds = (need) => collect(board, (n) => n.attrs?.["data-sn"] && n.attrs["data-need"] === need && n.attrs["data-actor-id"] === "1").map((n) => n.attrs["data-sn"]);
-  assert.deepEqual(kinds("food"), ["intake", "announce", "penalty", "toggle"]);
-  assert.deepEqual(kinds("water"), ["intake", "announce", "save", "penalty", "toggle"]);
-  assert.deepEqual(kinds("rest"), ["rested", "announce", "save", "penalty", "toggle"]);
+  assert.deepEqual(kinds("food"), ["intake", "penalty", "toggle"]);
+  assert.deepEqual(kinds("water"), ["intake", "save", "penalty", "toggle"]);
+  assert.deepEqual(kinds("rest"), ["rested", "save", "penalty", "toggle"]);
 });
 
 test("character names are text, never markup", () => {

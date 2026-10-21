@@ -1,7 +1,11 @@
 {
   "SURVIVAL_NEEDS": {
     "Title": "Survival Needs",
-    "Need": { "food": "Food", "water": "Water", "rest": "Rest" },
+    "Need": {
+      "food": "Food",
+      "water": "Water",
+      "rest": "Rest"
+    },
     "Level": {
       "ok": "OK",
       "soon": "Soon",
@@ -10,7 +14,10 @@
       "exempt": "Not needed",
       "untracked": "Not tracked"
     },
-    "Time": { "Hours": "{h} h", "DaysHours": "{d} d {h} h" },
+    "Time": {
+      "Hours": "{h} h",
+      "DaysHours": "{d} d {h} h"
+    },
     "Settings": {
       "enabled": {
         "Name": "Track needs",
@@ -44,12 +51,12 @@
       "Pending": "{n} penalty owed",
       "Saves": "{n} save(s) owed",
       "Action": {
-        "intake": { "food": "Ate (pick an item)", "water": "Drank (pick an item)" },
-        "rested": { "rest": "Finished a long rest" },
-        "announce": {
-          "food": "Tell the table they need to eat",
-          "water": "Tell the table they need to drink",
-          "rest": "Tell the table they need to rest"
+        "intake": {
+          "food": "Ate (pick an item)",
+          "water": "Drank (pick an item)"
+        },
+        "rested": {
+          "rest": "Finished a long rest"
         },
         "save": {
           "water": "Roll Constitution save DC 15 (half ration)",
@@ -78,19 +85,32 @@
         "water": "Last drank {time} ago.",
         "rest": "Last long rest {time} ago."
       },
-      "Limit": "Hunger limit: {days} day(s) without food (3 + Constitution modifier).",
-      "Pending": "Exhaustion owed: {n}.",
-      "Saves": "Constitution saves owed: {n} (DC {dc}).",
+      "Pending": "Exhaustion to apply: {n}",
       "Button": {
-        "intake": { "food": "Ate…", "water": "Drank…" },
-        "penalty": { "food": "Apply hunger", "water": "Apply thirst", "rest": "Apply exhaustion" },
-        "rested": "Rested",
-        "save": "Con save DC {dc}",
-        "announce": "Tell the player"
+        "intake": {
+          "food": "Ate…",
+          "water": "Drank…"
+        },
+        "penalty": {
+          "food": "Apply hunger",
+          "water": "Apply thirst",
+          "rest": "Apply exhaustion"
+        },
+        "rested": "Rested"
+      },
+      "LimitLeft": "The time without food runs out in {time}.",
+      "LimitReached": "The time without food has run out.",
+      "Hint": {
+        "water": "Drank only half the ration? Instead of the penalty, roll a Constitution save, DC {dc}.",
+        "rest": "From the next hour on: a Constitution save, DC {dc}, every hour; a failure is 1 exhaustion.",
+        "restSaves": "{n} hour(s) over the limit: a Constitution save, DC {dc}, for each; every failure is 1 exhaustion."
       }
     },
     "Dialog": {
-      "Title": { "food": "{actor}: eat", "water": "{actor}: drink" },
+      "Title": {
+        "food": "{actor}: eat",
+        "water": "{actor}: drink"
+      },
       "Hint": {
         "food": "What does {actor} eat? Items of the Food type are listed.",
         "water": "What does {actor} drink? Items of the Food type are listed."
@@ -107,19 +127,12 @@
       "Drank": "{actor} drank.",
       "AteItem": "{actor} ate {item}.",
       "DrankItem": "{actor} drank {item}.",
-      "Left": { "quantity": "({n} left)", "charges": "({n} charge(s) left)" },
-      "NothingLeft": "(nothing was left to use up)",
       "ExhaustionRemoved": "One level of exhaustion is gone.",
       "Rested": "{actor} finished a long rest.",
       "Penalty": {
         "food": "{actor} is malnourished: +{n} exhaustion (level {level}).",
         "water": "{actor} is dehydrated: +{n} exhaustion (level {level}).",
         "rest": "{actor} is worn out from lack of rest: +{n} exhaustion (level {level})."
-      },
-      "Announce": {
-        "food": "{actor} needs to eat.",
-        "water": "{actor} needs to drink.",
-        "rest": "{actor} needs a long rest."
       }
     },
     "Notify": {

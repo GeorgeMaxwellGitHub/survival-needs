@@ -39,9 +39,9 @@ One row per character, three cells (Food, Water, Rest). Each cell shows the stat
 since the last time, how many penalties or saves are owed, and these buttons:
 
 - **Ate / Drank / Rested**: restarts the timer. For food and water a dialog lists the character's consumables of the
-  *Food* type; pick the one that was used up (a charge or a unit is spent, nothing is deleted) or "No item". An optional
-  checkbox also removes one exhaustion level that this module gave for the same need.
-- **Megaphone**: a public chat message telling the table the character needs to eat, drink or rest.
+  *Food* type (with quantity and charges); pick one and dnd5e's own usage dialog opens, so charges and quantity are
+  spent exactly as when the player clicks the item. The timer restarts only if the item was actually used; "No item"
+  just marks the time. An optional checkbox also removes one exhaustion level that this module gave for the same need.
 - **d20** (water, rest): rolls the Constitution save (DC 15 for water, the configured DC for rest).
 - **Warning sign**: applies the penalty: the Malnutrition or Dehydration status where it applies, plus exhaustion.
 - **Wand / ban / check**: cycles the override for that need: automatic (by race) → not needed → needed → automatic.
@@ -50,8 +50,10 @@ Double-click a name to open the character sheet.
 
 ## Chat cards
 
-When a need comes due, the GM gets a whispered chat card with the same actions as buttons (for example "Ate…", "Apply
-hunger", "Tell the player"). A card is posted once when the need comes due, again when it becomes overdue, and for food
+When a need comes due, the GM gets a whispered chat card: a link to the character, how long ago they last ate, drank or
+rested, how long until the time without food runs out, the exhaustion to apply (in red), and a short italic reminder
+about the save when one applies. Buttons: "Ate…" / "Drank…" / "Rested" and "Apply hunger" / "Apply thirst" /
+"Apply exhaustion". A card is posted once when the need comes due, again when it becomes overdue, and for food
 and water again for each further penalty. Only the active GM posts cards.
 
 ## Settings (Game Settings → Configure Settings → Module Settings)

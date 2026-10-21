@@ -1,4 +1,4 @@
-import { escapeHtml, guessIntakeKind, planConsumption } from "./logic.mjs";
+import { escapeHtml, guessIntakeKind } from "./logic.mjs";
 
 function stockOf(item) {
   const max = Number(item.system?.uses?.max) || 0;
@@ -9,11 +9,7 @@ function stockOf(item) {
 /** Consumables of the "Food" type the character carries, those that match the need first. */
 export function intakeCandidates(actor, need) {
   const items = [...actor.items].filter((i) => i.type === "consumable" && i.system?.type?.value === "food");
-  const rows = items.map((item) => ({
-    item,
-    available: !!planConsumption({ quantity: item.system?.quantity, usesMax: item.system?.uses?.max, usesSpent: item.system?.uses?.spent }),
-    matches: guessIntakeKind(item.name) === need
-  }));
+  const rows = items.map((item) => ({ item, matches: guessIntakeKind(item.name) === need }));
   return rows.sort((a, b) => (b.matches - a.matches) || a.item.name.localeCompare(b.item.name));
 }
 
@@ -23,13 +19,12 @@ export function intakeCandidates(actor, need) {
  */
 export async function pickIntake(actor, need) {
   const rows = intakeCandidates(actor, need);
-  const preselected = rows.find((r) => r.matches && r.available);
+  const preselected = rows.find((r) => r.matches);
   const t = (key, data) => game.i18n.format(`SURVIVAL_NEEDS.Dialog.${key}`, data);
 
-  const radios = rows.map(({ item, available }) => {
+  const radios = rows.map(({ item }) => {
     const checked = item === preselected?.item ? " checked" : "";
-    const disabled = available ? "" : " disabled";
-    return `<label class="survival-needs-choice"><input type="radio" name="item" value="${escapeHtml(item.id)}"${checked}${disabled}>`
+    return `<label class="survival-needs-choice"><input type="radio" name="item" value="${escapeHtml(item.id)}"${checked}>`
       + `<img src="${escapeHtml(item.img)}" alt=""><span>${escapeHtml(item.name)}</span><em>${escapeHtml(stockOf(item))}</em></label>`;
   }).join("");
   const none = `<label class="survival-needs-choice"><input type="radio" name="item" value=""${preselected ? "" : " checked"}>`

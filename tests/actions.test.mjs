@@ -57,16 +57,23 @@ test("the status is not toggled again when the character already has it", async 
   assert.equal(a.log.toggles.length, 0);
 });
 
-test("eating restarts the timer, clears the status and uses up a ration", async () => {
+test("eating restarts the timer and clears the status; with an item no extra message is posted", async () => {
   const a = actor({ statuses: ["malnutrition"] });
-  const item = { name: "Rations", system: { quantity: 2, uses: { max: 1, spent: 0 } }, update: async function (d) { this.updated = d; } };
-  await markIntake(a, "food", { item });
-  assert.deepEqual(item.updated, { "system.quantity": 1, "system.uses.spent": 0 });
+  const before = messages.length;
+  await markIntake(a, "food", { item: { name: "Rations" } });
   assert.equal(a.log.updates[0]["flags.survival-needs.last.food"], 500);
   assert.equal(a.log.updates[0]["flags.survival-needs.applied.food"], 0);
   assert.equal(a.log.updates[0]["flags.survival-needs.notified.-=food"], null);
   assert.deepEqual(a.log.toggles, [["malnutrition", { active: false }]]);
-  assert.match(messages.at(-1).content, /AteItem/);
+  assert.equal(messages.length, before);
+});
+
+test("eating without an item says so in chat", async () => {
+  const a = actor();
+  const before = messages.length;
+  await markIntake(a, "water");
+  assert.equal(messages.length, before + 1);
+  assert.match(messages.at(-1).content, /Chat.Drank/);
 });
 
 test("eating can take back one exhaustion level the module gave for hunger, but never more than it gave", async () => {

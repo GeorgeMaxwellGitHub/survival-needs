@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   HOUR, cycleOverride, durationParts, escapeHtml, evaluateNeed, exhaustionToAdd, foodLimitDays, guessIntakeKind,
-  hoursSince, isExempt, levelRank, planConsumption, planNotification, raceExemptions
+  hoursSince, isExempt, levelRank, planNotification, raceExemptions
 } from "../scripts/logic.mjs";
 
 const h = (n) => n * HOUR;
@@ -121,21 +121,6 @@ test("exemption: the GM override wins, rest is never skipped by race", () => {
   assert.equal(cycleOverride(undefined), true);
   assert.equal(cycleOverride(true), false);
   assert.equal(cycleOverride(false), undefined);
-});
-
-test("consumption: a ration with one charge uses up one unit, a waterskin spends charges, nothing is deleted", () => {
-  assert.deepEqual(planConsumption({ quantity: 2, usesMax: 1, usesSpent: 0 }), {
-    updates: { "system.quantity": 1, "system.uses.spent": 0 }, left: 1, unit: "quantity"
-  });
-  assert.deepEqual(planConsumption({ quantity: 0, usesMax: 4, usesSpent: 0 }), {
-    updates: { "system.uses.spent": 1 }, left: 3, unit: "charges"
-  });
-  assert.deepEqual(planConsumption({ quantity: 1, usesMax: 1, usesSpent: 0 }), {
-    updates: { "system.uses.spent": 1 }, left: 0, unit: "charges"
-  });
-  assert.equal(planConsumption({ quantity: 1, usesMax: 4, usesSpent: 4 }), null);
-  assert.deepEqual(planConsumption({ quantity: 3 }), { updates: { "system.quantity": 2 }, left: 2, unit: "quantity" });
-  assert.equal(planConsumption({ quantity: 0 }), null);
 });
 
 test("items are guessed as water or food by name", () => {

@@ -35,7 +35,7 @@ await import("../scripts/survival-needs.mjs");
 const HOUR = 3600;
 function makeActor(id, name, { race = null } = {}) {
   const actor = {
-    id, name, type: "character", flags: {}, statuses: new Set(),
+    id, name, uuid: `Actor.${id}`, type: "character", flags: {}, statuses: new Set(),
     system: { attributes: { exhaustion: 0 }, abilities: { con: { mod: 0 } }, details: { race } },
     update: async (data) => {
       updates.push([id, data]);
@@ -78,9 +78,26 @@ test("a card is whispered to the GM once when food comes due, and not again on t
   assert.deepEqual(messages[0].flags["survival-needs"].card, { actorId: "a2", need: "food" });
   assert.match(messages[0].content, /data-sn-action="intake"/);
   assert.match(messages[0].content, /data-sn-action="penalty"/);
+  assert.doesNotMatch(messages[0].content, /data-sn-action="(save|announce)"/);
+  assert.match(messages[0].content, /@UUID\[Actor\.a2\]\{Brin\}/);
+  assert.match(messages[0].content, /Card\.LimitLeft.*\{\\"d\\":2,\\"h\\":0\}/);
+  assert.doesNotMatch(messages[0].content, /<h3/);
   await tick();
   assert.equal(messages.length, 1);
   assert.equal(a.flags["survival-needs"].notified.food, "due:0");
+});
+
+test("an overdue food card shows the owed exhaustion in red and that the limit has run out", async () => {
+  messages.length = 0;
+  const a = makeActor("a7", "Fen");
+  a.flags["survival-needs"] = { last: { food: 0, water: 96 * HOUR, rest: 96 * HOUR } };
+  setParty(a);
+  world.time = 96 * HOUR;
+  const { tick } = await import("../scripts/survival-needs.mjs");
+  await tick();
+  const food = messages.find((m) => m.flags["survival-needs"].card.need === "food");
+  assert.match(food.content, /survival-needs-owed/);
+  assert.match(food.content, /Card\.LimitReached/);
 });
 
 test("names are escaped in the card", async () => {
@@ -92,7 +109,7 @@ test("names are escaped in the card", async () => {
   const { tick } = await import("../scripts/survival-needs.mjs");
   await tick();
   assert.ok(!messages[0].content.includes("<b>Evil"));
-  assert.ok(messages[0].content.includes("&lt;b&gt;Evil"));
+  assert.ok(messages[0].content.includes("@UUID[Actor.a3]{&lt;b&gt;Evil&lt;/b&gt;}"));
 });
 
 test("a race that needs no food or water gets no food or water cards but still needs rest", async () => {

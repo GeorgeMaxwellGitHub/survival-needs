@@ -145,6 +145,13 @@ function bindCard(message, html) {
   try {
     const card = message.flags?.[ID]?.card;
     if (!card || !game.user.isGM) return;
+    // Show a tent instead of the GM's avatar in the message header.
+    const avatar = html.querySelector?.(".message-header img");
+    if (avatar) {
+      const icon = document.createElement("i");
+      icon.className = "fa-solid fa-campground survival-needs-avatar";
+      avatar.replaceWith(icon);
+    }
     for (const btn of html.querySelectorAll("[data-sn-action]")) {
       if (btn.dataset.snBound) continue;
       btn.dataset.snBound = "1";
